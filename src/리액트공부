@@ -1,0 +1,49 @@
+API = Application Programming Interface 
+즉 프로그램 간 상호 작용을 위한 인터페이스를 정의하는 파일
+
+Auth = Firebase에서 제공하는 인증서비스, 사용자의 로그인 로그아웃 회원가입 등.
+google을 이용해서 로그인 하는경우 
+
+예시 코드.
+; import { getAuth, Auth } from "firebase/auth";
+
+; const auth: Auth = getAuth();
+
+; // 사용자 로그인
+; auth.signInWithPopup(googleAuthProvider);
+
+; // 사용자 로그아웃
+; auth.signOut();
+
+
+Analytics = Firebase에서 제공하는 분석 서비스.
+앱의 사용량, 이벤트추적, 사용자동작 등  추적하고 분석.
+예를들어서 사용자가 어떤 페이지에 방문할 때의 이벤트를 기록
+
+예시코드 
+; import { getAnalytics, Analytics } from "firebase/analytics";
+
+; const analytics: Analytics = getAnalytics();
+
+; // 페이지 뷰 이벤트 추적
+; analytics.logEvent("page_view", { page_path: "/home" });
+
+
+onAuthStateChanged = 사용자의 로그인 상태가 변경될 때마다 
+호출되는 콜백함수 등록하는 메서드
+
+예를 들어, 사용자가 로그인하거나 
+로그아웃할 때마다 해당 상태를 반영하는 경우:
+
+예시 코드
+
+; const unsubscribe = onAuthStateChanged(auth, (user) => {
+;   if (user) {
+;     // 사용자가 로그인한 상태
+;     console.log("사용자가 로그인했습니다:", user.displayName);
+;   } else {
+;     // 사용자가 로그아웃한 상태
+;     console.log("사용자가 로그아웃했습니다.");
+;   }
+; });
+
