@@ -1,139 +1,24 @@
 import {
   Box,
-  Button,
   CircularProgress,
   Container,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Header from "./components/Header";
+import Onboarding from "./components/Onboarding";
+import EditProfile from "./components/EditProfile";
 import { WithFirebaseApiProps, withFirebaseApi } from "./Firebase";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import { RootState } from "./redux/store";
-import {
-  asyncSetUserInfo,
-  asyncUpdateUserInfo,
-  handleUserChange,
-} from "./redux/userSlice";
+import { handleUserChange } from "./redux/userSlice";
+
 const isLoadingState = (state: RootState): boolean => {
   return state.user.userId === undefined;
 };
-const OnboardingBase = (props: WithFirebaseApiProps) => {
-  const userId = useAppSelector((state: RootState) => state.user.userId);
-  const dispatch = useAppDispatch();
-  const [username, setUsername] = useState<string>("");
-  const [file, setFile] = useState<File | null>(null);
-  let selectedProfilePic = null;
-  if (file !== null) {
-    selectedProfilePic = <img src={URL.createObjectURL(file!)} width={200} />;
-  }
-  return (
-    <>
-      <Typography variant="h2" component="div" align="left">
-        Finish setting up your account
-      </Typography>
-      <Stack direction="row" spacing={2}>
-        <Typography
-          variant="body1"
-          align="left"
-          sx={{ marginTop: "auto", marginBottom: "auto" }}
-        >
-          Username:
-        </Typography>
-        <TextField
-          value={username}
-          label="Edit Username"
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </Stack>
-      {selectedProfilePic}
-      <Button variant="contained" component="label">
-        Upload
-        <input
-          hidden
-          accept="image/*"
-          onChange={(e) => {
-            const files = e.target.files;
-            if (files == null || files.length === 0) {
-              setFile(null);
-            } else {
-              setFile(files[0]);
-            }
-          }}
-          type="file"
-        />
-      </Button>
-      <Button
-        variant="contained"
-        sx={{ marginTop: 2 }}
-        onClick={async () => {
-          const handle = await props.firebaseApi.asyncUploadImage(
-            userId!,
-            file!
-          );
-          dispatch(
-            asyncSetUserInfo({
-              firebaseApi: props.firebaseApi,
-              userId: userId!,
-              userInfo: {
-                username: username,
-                profilePicHandle: handle,
-              },
-            })
-          );
-        }}
-        disabled={file === null || username.length === 0}
-      >
-        SUBMIT
-      </Button>
-    </>
-  );
-};
-const Onboarding = withFirebaseApi(OnboardingBase);
-const EditProfileBase = (props: WithFirebaseApiProps) => {
-  const userId = useAppSelector((state: RootState) => state.user.userId);
-  const dispatch = useAppDispatch();
-  const [username, setUsername] = useState<string>("");
-  return (
-    <>
-      <Typography variant="h2" component="div" align="left">
-        Edit Profile
-      </Typography>
-      <Stack direction="row" spacing={2}>
-        <Typography
-          variant="body1"
-          align="left"
-          sx={{ marginTop: "auto", marginBottom: "auto" }}
-        >
-          Username:
-        </Typography>
-        <TextField
-          value={username}
-          label="Edit Username"
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </Stack>
-      <Button
-        variant="contained"
-        sx={{ marginTop: 2 }}
-        onClick={async () => {
-          dispatch(
-            asyncUpdateUserInfo({
-              firebaseApi: props.firebaseApi,
-              userId: userId!,
-              userInfo: { username: username },
-            })
-          );
-        }}
-      >
-        SUBMIT
-      </Button>
-    </>
-  );
-};
-const EditProfile = withFirebaseApi(EditProfileBase);
+
 const Body = () => {
   const userId = useAppSelector((state: RootState) => state.user.userId);
   const userInfo = useAppSelector(
@@ -150,6 +35,7 @@ const Body = () => {
       </>
     );
   }
+
   if (userInfoLoadState === "loading") {
     return <CircularProgress />;
   }
@@ -170,9 +56,11 @@ const Body = () => {
     </>
   );
 };
+
 const App = (props: WithFirebaseApiProps) => {
   const isLoading = useAppSelector(isLoadingState);
   const dispatch = useAppDispatch();
+
   useEffect(() => {
     return props.firebaseApi.onAuthStateChanged((user) => {
       if (user) {
@@ -182,6 +70,7 @@ const App = (props: WithFirebaseApiProps) => {
       }
     });
   }, []);
+
   if (isLoading) {
     return <CircularProgress sx={{ margin: "auto" }} />;
   }
@@ -196,4 +85,5 @@ const App = (props: WithFirebaseApiProps) => {
     </>
   );
 };
+
 export default withFirebaseApi(App);
